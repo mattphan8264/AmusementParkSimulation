@@ -52,7 +52,7 @@ class Group:
         
         #generating which rides have fast passes. Place holder until actual data is here
         for i in range(np.random.randint(len(destinations))):
-            randomVal = np.random.randint(len(rideID))
+            randomVal = np.random.randint(len(destinations))
             if (destinations[randomVal] in fastPassRides):
                 self.FastPass[randomVal] = 1
         
