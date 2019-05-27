@@ -208,42 +208,43 @@ def initGroups():
         for a in range(1, np.random.randint(2, maxDestinations)):
             destinations.append(rideID[np.random.randint(len(rideID))])
         GroupList.append(Group(i, destinations, np.random.randint(1, 6)))
+
+if __name__ == "__main__":    
+    setUpGrid()
+    initGroups()
     
-setUpGrid()
-initGroups()
-
-CurrentEntered = 0
-
-#Run for as long as park is open.
-#Every person walks, then check all rides
-for i in range(AmusementParkOpenTime):
-    CurrentEntered += MaxEnterAmount
-    if (CurrentEntered > len(GroupList)):
-        CurrentEntered = len(GroupList)
+    CurrentEntered = 0
+    
+    #Run for as long as park is open.
+    #Every person walks, then check all rides
+    for i in range(AmusementParkOpenTime):
+        CurrentEntered += MaxEnterAmount
+        if (CurrentEntered > len(GroupList)):
+            CurrentEntered = len(GroupList)
+            
+        for i in range(CurrentEntered):
+            if (GroupList[i].Status == -1):
+                GroupList[i].Status = 0
+            GroupList[i].walk()
         
-    for i in range(CurrentEntered):
-        if (GroupList[i].Status == -1):
-            GroupList[i].Status = 0
-        GroupList[i].walk()
-    
-    for i in range(len(AmusementRideList)):
-        AmusementRideList[i].Ride()
-        AmusementRideList[i].FastPassRide()
-    
-    #Plot the graphs
-    #1st graph is for ride locations
-    #2nd graph is movement of groups    
-    plt.clf()
-    
-    plt.figure(1)
-    plt.imshow(grid)
-    plt.axis('off')
-    
-    plt.figure(2)
-    plt.imshow(walkGrid)
-    plt.axis('off')
-    
-    plt.show()
-    plt.pause(.5)
-    
+        for i in range(len(AmusementRideList)):
+            AmusementRideList[i].Ride()
+            AmusementRideList[i].FastPassRide()
+        
+        #Plot the graphs
+        #1st graph is for ride locations
+        #2nd graph is movement of groups    
+        plt.clf()
+        
+        plt.figure(1)
+        plt.imshow(grid)
+        plt.axis('off')
+        
+        plt.figure(2)
+        plt.imshow(walkGrid)
+        plt.axis('off')
+        
+        plt.show()
+        plt.pause(.5)
+        
     
