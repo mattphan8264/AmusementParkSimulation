@@ -100,7 +100,7 @@ class Group:
     def walk(self):
         #If leaving and at exit, dont move anymore
         if (self.Status == LEAVING):
-            if (self.Location == [0,0]):
+            if (self.Location == Entrance):
                 return
         elif (self.Status == WALKING or self.Status == WAITING):
             if (self.ID == 0):
