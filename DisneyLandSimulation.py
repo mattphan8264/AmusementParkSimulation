@@ -5,30 +5,50 @@ import time
 #Globals ==============================
 
 #How big the grid will be
-GridWidth = 10
-GridHeight = 10
+GridWidth = 30
+GridHeight = 20
 grid = np.zeros((GridWidth, GridHeight)) - 1    #grid that holds position of rides
 walkGrid = np.zeros((GridWidth, GridHeight))    #grid that holds amount of people per acre
 
 #Ride information. Each index corresponds to a single ride (i.e. index 0 in ridelocation, ID, duration, and max
 #are for the same ride)
-ridelocation = [[0, GridHeight - 1], [GridWidth - 1, 0], [GridWidth - 1, GridHeight - 1], [4, 2], [8, 7], [8, 1], [2, 5], [5, 5], [1, 3]]
-rideID = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-rideDuration = [5, 7, 9, 4, 7, 3, 5, 4, 7]
-rideMax = [5, 7, 9, 5, 7, 9, 7, 4, 3]
-fastPassRides = [0, 2, 6]
-maxDestinations = 3
+ridelocation = [[27, 18], [8, 18], [23, 7], [7, 16], [9, 17], [13, 17], [21, 15], [5, 16], [4, 16], [13, 17], 
+                [13, 3], [22, 4], [17, 9], [18, 8], [1, 10], [20, 7], [20, 6], [19, 10], [18, 7], [23, 9], 
+                [16, 7], [8, 10], [16, 2], [16, 8], [19, 8], [15, 7], [9, 10], [16, 5], [22, 2], [7, 10] ]
+rideID = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+ridePercentages = [.1263, .0944, .0788, .0707, .0654, .0593, .0590, .0562, .0537, .0352, .0348, .0268, .0236, .0228, .0213, .0197, .0161, .0146, .0137, .0131, .0131, .0119, .0107,
+                    .0101, .0100, .0089, .0089, .0072, .0070, .0067]
+rideMax = [163, 352, 115, 773, 128, 213, 169, 369, 261, 246, 583, 237, 184, 28, 143, 40, 27, 16, 16, 45, 60, 360, 10, 20, 16, 30, 210, 24, 19, 100]
+rideDuration = [5, 10, 4, 15, 4, 5, 7, 9, 11, 8, 14, 10, 13, 3, 4, 4, 2, 2, 2, 5, 3, 18, 1, 2, 2, 3, 14, 4, 4, 10]
+rideNames = ['Space Mountain', 'Indiana Jones Adventure', 'Matterhorn Bobsleds', 'Pirates of the Caribbean', 'Big Thunder Mountain Railworld', 'Autopia', 'Star Tours The Adventures Continue',
+            'Haunted Mansion', 'Splash Mountain', 'Jungle Cruise', 'Its a Small World', 'Storybook Land Canal Boats', 'Finding Nemo Submarine Voyage', 'Peter Pans Flight',
+            'The Many Adventures of Winnie the Pooh', 'Alice in Wonderland', 'Mad Tea Party', 'Astro Orbiter', 'Dumbo the Flying Elephant', 'Buzz Lightyear Astro Blasters', 
+            'King Arthur Carrousel', 'Mark Twain Riverboat', 'Gadgets Go Coaster', 'Snow Whites Scary Adventures', 'Mr. Toads Wild Ride', 'Pinocchios Daring Journey', 'Sailing Ship Columbia'
+            'Casey Jr. Circus Train', 'Roger Rabbits Car Toon Spin', 'Davy Crocketts Explorer Canoes']
+
+fastPassRides = [0, 1, 2, 4, 6, 7, 8, 10, 19, 28]
 maxAttendees = 100
 
 #Our focus group
-GroupDestinations = [0, 1, 2, 3, 4]
-GroupAmount = 4
+GroupDestinations = [0, 3, 2, 6, 8, 10, 15]
+GroupAmount = 3
+TotalWalkSteps = 0
+MinWalkSteps = 0
+OptimizedDestination = GroupDestinations
+Entrance = [17, 19]
+AverageRidesPerDay = 9
+Std = 1
+
+ShuffleAmount = 5
+Repetitions = 10
+PlotOn = False
+
 
 #How big the park is
 DisneyLandAcres = 85
 DefaultWalkTime = 1
 WalkDelayAmount = 100   #How many people it takes to add delay to the group in a particular cell
-AmusementParkOpenTime = 640     #how long the park stays open
+AmusementParkOpenTime = 320     #how long the park stays open
 MaxEnterAmount = 3  #how many people can enter the park at start
 
 GroupList = []
@@ -49,6 +69,7 @@ class Group:
         self.Count = count
         self.Destinations = destinations
         self.FastPass = np.zeros(len(destinations))
+        self.TotalSteps = 0
         
         #generating which rides have fast passes. Place holder until actual data is here
         for i in range(np.random.randint(len(destinations))):
@@ -58,7 +79,7 @@ class Group:
         
         self.CurrentDestination = 0
         self.Status = -1
-        self.Location = [0, 0]
+        self.Location = [17, 19]
         #Adding group member count to start position
         walkGrid[self.Location[0]][self.Location[1]] += self.Count
         self.WalkTime = 0
@@ -81,6 +102,9 @@ class Group:
         if (self.Status == LEAVING):
             if (self.Location == [0,0]):
                 return
+        elif (self.Status == WALKING or self.Status == WAITING):
+            if (self.ID == 0):
+                self.TotalSteps += 1
         self.WalkTime -= 1
         
         #If can walk, walk
@@ -88,10 +112,14 @@ class Group:
             walkGrid[self.Location[0]][self.Location[1]] -= self.Count
             #If leaving, head towards 0 0
             if (self.Status == LEAVING):
-                if (self.Location[0] > 0):
+                if (self.Location[0] > Entrance[0]):
                     self.Location[0] -= 1
-                elif (self.Location[1] > 0):
+                elif (self.Location[0] < Entrance[0]):
+                    self.Location[0] += 1
+                elif (self.Location[1] > Entrance[1]):
                     self.Location[1] -= 1
+                elif (self.Location[1] < Entrance[1]):
+                    self.Location[1] += 1
             #If walking, walk towards destination
             elif (self.Status == WALKING):
                 if (self.Location[0] > self.NextDestination[0]):
@@ -194,7 +222,7 @@ class AmusementRide:
                     GroupList[self.GroupRiding[i][0]].rideFinished()
 
 #Initialize the grid and add amusement park rides to grid
-def setUpGrid():
+def setUpGrid():    
     for i in range(len(ridelocation)):
           grid[ridelocation[i][0]][ridelocation[i][1]] = rideID[i]
           AmusementRideList.append(AmusementRide(rideDuration[i], rideMax[i]))
@@ -205,46 +233,83 @@ def initGroups():
             
     for i in range(1, maxAttendees):
         destinations = []
-        for a in range(1, np.random.randint(2, maxDestinations)):
-            destinations.append(rideID[np.random.randint(len(rideID))])
+        
+        rideCount = 0
+        randomRideAmount = int(np.random.normal(AverageRidesPerDay, Std, 1))
+        if (randomRideAmount < 1):
+            randomRideAmount = 1
+        while (rideCount < randomRideAmount):
+            rideChosen = np.random.choice(rideID, p = ridePercentages)
+            if rideChosen in destinations:
+                if np.random.randint(10) < 1:
+                    destinations.append(rideChosen)
+                    rideCount += 1
+            else:
+                destinations.append(rideChosen)
+                rideCount += 1
         GroupList.append(Group(i, destinations, np.random.randint(1, 6)))
+    
 
-if __name__ == "__main__":    
-    setUpGrid()
-    initGroups()
+for shuffle in range(ShuffleAmount):
     
-    CurrentEntered = 0
-    
-    #Run for as long as park is open.
-    #Every person walks, then check all rides
-    for i in range(AmusementParkOpenTime):
-        CurrentEntered += MaxEnterAmount
-        if (CurrentEntered > len(GroupList)):
-            CurrentEntered = len(GroupList)
+    for rep in range(Repetitions):  
+        #Run for as long as park is open.
+        #Every person walks, then check all rides
+        setUpGrid()
+        initGroups()
+        
+        CurrentEntered = 0
+        for i in range(AmusementParkOpenTime):
+            CurrentEntered += MaxEnterAmount
+            if (CurrentEntered > len(GroupList)):
+                CurrentEntered = len(GroupList)
+                
+            for i in range(CurrentEntered):
+                if (GroupList[i].Status == -1):
+                    GroupList[i].Status = 0
+                GroupList[i].walk()
             
-        for i in range(CurrentEntered):
-            if (GroupList[i].Status == -1):
-                GroupList[i].Status = 0
-            GroupList[i].walk()
-        
-        for i in range(len(AmusementRideList)):
-            AmusementRideList[i].Ride()
-            AmusementRideList[i].FastPassRide()
-        
-        #Plot the graphs
-        #1st graph is for ride locations
-        #2nd graph is movement of groups    
-        plt.clf()
-        
-        plt.figure(1)
-        plt.imshow(grid)
-        plt.axis('off')
-        
-        plt.figure(2)
-        plt.imshow(walkGrid)
-        plt.axis('off')
-        
-        plt.show()
-        plt.pause(.5)
-        
+            for i in range(len(AmusementRideList)):
+                AmusementRideList[i].Ride()
+                AmusementRideList[i].FastPassRide()
+            
+            #Plot the graphs
+            #1st graph is for ride locations
+            #2nd graph is movement of groups    
+            if (PlotOn):
+                plt.clf()
+                
+                plt.figure(1)
+                plt.imshow(grid)
+                plt.axis('off')
+                
+                plt.figure(2)
+                plt.imshow(walkGrid)
+                plt.axis('off')
+                
+                plt.show()
+                plt.pause(.1)
+        walkGrid = np.zeros((GridWidth, GridHeight))
+        TotalWalkSteps += GroupList[0].TotalSteps
+        GroupList = []
+          
+    TotalWalkSteps = int(TotalWalkSteps / Repetitions)
+    if MinWalkSteps == 0 or TotalWalkSteps < MinWalkSteps:
+        MinWalkSteps = TotalWalkSteps
+        OptimizedDestinations = GroupDestinations
+    TotalWalkSteps = 0
+    
+    np.random.shuffle(GroupDestinations)
+    
+MinWalkSteps *= 2
+Modulus = MinWalkSteps % 60
+MinWalkSteps = int(MinWalkSteps / 60)
+print('Minimum time for ride schedule = ' + str(MinWalkSteps) + 'h' + str(Modulus) + 'm')
+RideString = ''
+for i in range(len(OptimizedDestination)):
+    RideString = RideString + str(rideNames[OptimizedDestination[i]])
+    if i < len(OptimizedDestination) - 1:
+        RideString += ' to '
+print(RideString)
+    
     
