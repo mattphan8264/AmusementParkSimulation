@@ -10,6 +10,7 @@ GridHeight = 20
 grid = np.zeros((GridWidth, GridHeight)) - 1    #grid that holds position of rides
 walkGrid = np.zeros((GridWidth, GridHeight))    #grid that holds amount of people per acre
 
+
 #Ride information. Each index corresponds to a single ride (i.e. index 0 in ridelocation, ID, duration, and max
 #are for the same ride)
 ridelocation = [[27, 18], [8, 18], [23, 7], [7, 16], [9, 17], [13, 17], [21, 15], [5, 16], [4, 16], [13, 17], 
@@ -27,7 +28,10 @@ rideNames = ['Space Mountain', 'Indiana Jones Adventure', 'Matterhorn Bobsleds',
             'Casey Jr. Circus Train', 'Roger Rabbits Car Toon Spin', 'Davy Crocketts Explorer Canoes']
 
 fastPassRides = [0, 1, 2, 4, 6, 7, 8, 10, 19, 28]
-maxAttendees = 100
+
+Hours = np.arange(16) * 20
+AttendeesPerHour = [300, 100, 0, 400, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+maxAttendees = 1000
 
 #Our focus group
 GroupDestinations = [0, 3, 2, 6, 8, 10, 15]
@@ -38,6 +42,7 @@ OptimizedDestination = GroupDestinations
 Entrance = [17, 19]
 AverageRidesPerDay = 9
 Std = 1
+EntranceTime = 20
 
 ShuffleAmount = 5
 Repetitions = 10
@@ -261,17 +266,26 @@ for shuffle in range(ShuffleAmount):
         CurrentEntered = 0
         for i in range(AmusementParkOpenTime):
             CurrentEntered += MaxEnterAmount
+            Divisor = int(i / 20)
+            
+            if (CurrentEntered > AttendeesPerHour[Divisor]):
+                CurrentEntered = AttendeesPerHour[Divisor]
+            
             if (CurrentEntered > len(GroupList)):
                 CurrentEntered = len(GroupList)
-                
-            for i in range(CurrentEntered):
-                if (GroupList[i].Status == -1):
-                    GroupList[i].Status = 0
-                GroupList[i].walk()
+               
+            if ( i >= EntranceTime):
+                if (GroupList[0].Status == -1):
+                    GroupList[0].Status = 0
+                GroupList[0].walk()
+            for j in range(1, CurrentEntered):
+                if (GroupList[j].Status == -1):
+                    GroupList[j].Status = 0
+                GroupList[j].walk()
             
-            for i in range(len(AmusementRideList)):
-                AmusementRideList[i].Ride()
-                AmusementRideList[i].FastPassRide()
+            for k in range(len(AmusementRideList)):
+                AmusementRideList[k].Ride()
+                AmusementRideList[k].FastPassRide()
             
             #Plot the graphs
             #1st graph is for ride locations
