@@ -23,7 +23,6 @@ class TestGroup:
         D.ridelocation = [[2, 0], [1, 1], [0, 2]]
         D.rideDuration = [1, 2, 3]
         D.rideID = [0, 1, 2]
-        D.rideDuration = [1, 2, 3]
         D.rideMax = [5, 7, 9]
         D.fastPassRides = [0]
         self.group = D.Group(1, [1, 0, 2], 5)
