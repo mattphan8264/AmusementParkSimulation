@@ -109,3 +109,50 @@ class TestGroup:
         self.group.walk()
         assert self.group.Location == D.Entrance
         assert self.group.Status == D.LEAVING
+
+   
+class TestAmusementRide:
+    
+    def setup_method(self):
+        """setup an amusement ride to test each method"""
+        self.amusementRide = D.AmusementRide(4, 200)
+        
+    def test_init(self):
+        """Test constructor for TestAmusementRide"""
+        assert self.amusementRide.Duration == 4
+        assert self.amusementRide.MaxAttendees == 200
+        assert self.amusementRide.CurrentTime == 0
+        
+    def test_groupLinedUp(self):
+        """Tests groupLineUp and adding group"""
+        self.amusementRide.groupLinedUp(0, 5)
+        assert self.amusementRide.GroupWaiting == [[0, 5]] 
+    
+    def test_Ride(self):        
+        """Tests ride when there are under maximum attendees in line"""
+        self.amusementRide.CurrentTime = 0       
+        for i in range(0,5):          
+            self.amusementRide.groupLinedUp(i, 5)      
+        self.amusementRide.Ride()
+    
+        assert self.amusementRide.CurrentTime == 4
+        assert self.amusementRide.GroupRiding == [[0,5],[1,5],[2,5],[3,5],[4,5]]
+        assert self.amusementRide.GroupWaiting == []
+            
+    def test_Ride_Greater(self):
+        """Tests ride when there are over maximum attendees in line"""
+        self.amusementRide.CurrentTime = 0           
+        for i in range(0,45):          
+            self.amusementRide.groupLinedUp(i, 5)        
+        self.amusementRide.Ride()
+        
+        #In order to compare, make a new list range 0 to 200 (MaxAttendees)
+        list_of_lists = []        
+        for i in range(0,40):
+            inner_list = [i]            
+            inner_list.append(5)
+            list_of_lists.append(inner_list)
+        assert self.amusementRide.CurrentTime == 4
+        assert self.amusementRide.GroupRiding == list_of_lists
+        assert self.amusementRide.GroupWaiting == [[40,5],[41,5],[42,5],[43,5],[44,5]]
+      
