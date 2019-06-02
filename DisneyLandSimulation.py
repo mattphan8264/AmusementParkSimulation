@@ -442,11 +442,11 @@ for shuffle in range(ShuffleAmount):
         time = 0
         walkGrid = np.zeros((GridWidth, GridHeight))
         TotalWalk += GroupList[0].TotalSteps
-        GroupList = []
         
         walkStepArray.append(GroupList[0].totalWalkSteps)
         waitStepArray.append(GroupList[0].totalWaitSteps)
         leaveStepArray.append(GroupList[0].totalLeaveSteps)
+        GroupList = []
         
     TotalWaitStepArray.append(waitStepArray)
     TotalLeaveStepArray.append(leaveStepArray)
