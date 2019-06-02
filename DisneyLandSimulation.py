@@ -314,6 +314,9 @@ class AmusementRide:
                     self.GroupWaitingFastPass = []
                     
                 self.CurrentTimeFastPass = self.Duration
+                
+                for i in range(len(self.GroupRidingFastPass)):
+                    GroupList[self.GroupRidingFastPass[i][0]].Status = RIDING
         else:
             self.CurrentTimeFastPass -= 1
             
@@ -341,6 +344,9 @@ class AmusementRide:
                     self.GroupWaiting = []
                     
                 self.CurrentTime = self.Duration
+                
+                for i in range(len(self.GroupRiding)):
+                     GroupList[self.GroupRiding[i][0]].Status = RIDING
         else:
             self.CurrentTime -= 1
                 
