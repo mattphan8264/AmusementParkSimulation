@@ -36,6 +36,7 @@ rideAvailableTime = [[], [], [], [], [], [], [], [], [], [],
 fastPassRides = [0, 1, 2, 4, 6, 7, 8, 10, 19, 28]
 
 AttendeesPerHour = [300, 100, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+currentAttendeesPerHour = 0
 maxAttendees = 500
 repeatedRides = False
 
@@ -406,8 +407,10 @@ for shuffle in range(ShuffleAmount):
             CurrentEntered += MaxEnterAmount
             Divisor = int(i / 20)
             
-            if (CurrentEntered > AttendeesPerHour[Divisor]):
-                CurrentEntered = AttendeesPerHour[Divisor]
+            currentAttendeesPerHour += AttendeesPerHour[Divisor]
+            AttendeesPerHour[Divisor] = 0
+            if (CurrentEntered > currentAttendeesPerHour):
+                CurrentEntered = currentAttendeesPerHour
                 
             if (CurrentEntered > len(GroupList)):
                 CurrentEntered = len(GroupList)
