@@ -398,86 +398,86 @@ def initGroups():
                     rideCount += 1
         GroupList.append(Group(i, destinations, nodeDestinations, np.random.randint(1, 6)))
     
-
-for shuffle in range(ShuffleAmount):
-    
-    for rep in range(Repetitions):  
-        #Run for as long as park is open.
-        #Every person walks, then check all rides
-        setUpGrid()
-        initGroups()
+if __name__ == "__main__":
+    for shuffle in range(ShuffleAmount):
         
-        CurrentEntered = 0
-        for i in range(AmusementParkOpenTime):
-            time = i
-            CurrentEntered += MaxEnterAmount
-            Divisor = int(i / 20)
+        for rep in range(Repetitions):  
+            #Run for as long as park is open.
+            #Every person walks, then check all rides
+            setUpGrid()
+            initGroups()
             
-            currentAttendeesPerHour += AttendeesPerHour[Divisor]
-            AttendeesPerHour[Divisor] = 0
-            if (CurrentEntered > currentAttendeesPerHour):
-                CurrentEntered = currentAttendeesPerHour
+            CurrentEntered = 0
+            for i in range(AmusementParkOpenTime):
+                time = i
+                CurrentEntered += MaxEnterAmount
+                Divisor = int(i / 20)
                 
-            if (CurrentEntered > len(GroupList)):
-                CurrentEntered = len(GroupList)
+                currentAttendeesPerHour += AttendeesPerHour[Divisor]
+                AttendeesPerHour[Divisor] = 0
+                if (CurrentEntered > currentAttendeesPerHour):
+                    CurrentEntered = currentAttendeesPerHour
+                    
+                if (CurrentEntered > len(GroupList)):
+                    CurrentEntered = len(GroupList)
+                    
+                for i in range(CurrentEntered):
+                    if (GroupList[i].Status == -1):
+                        GroupList[i].Status = 0
+                        walkGrid[GroupList[i].Location[0]][GroupList[i].Location[1]] += GroupList[i].Count
+                    GroupList[i].walk()
                 
-            for i in range(CurrentEntered):
-                if (GroupList[i].Status == -1):
-                    GroupList[i].Status = 0
-                    walkGrid[GroupList[i].Location[0]][GroupList[i].Location[1]] += GroupList[i].Count
-                GroupList[i].walk()
+                for i in range(len(AmusementRideList)):
+                    AmusementRideList[i].Ride()
+                    AmusementRideList[i].FastPassRide()
+                
+                #Plot the graphs
+                #1st graph is for ride locations
+                #2nd graph is movement of groups    
+                if (PlotOn):
+                    plt.clf()
+                    
+                    plt.figure(1)
+                    plt.imshow(grid)
+                    plt.axis('off')
+                    
+                    plt.figure(2)
+                    plt.imshow(walkGrid)
+                    plt.axis('off')
+                    
+                    plt.show()
+                    plt.pause(.1)
+                    
+            time = 0
+            walkGrid = np.zeros((GridWidth, GridHeight))
+            TotalWalk += GroupList[0].TotalSteps
             
-            for i in range(len(AmusementRideList)):
-                AmusementRideList[i].Ride()
-                AmusementRideList[i].FastPassRide()
+            walkStepArray.append(GroupList[0].totalWalkSteps)
+            waitStepArray.append(GroupList[0].totalWaitSteps)
+            leaveStepArray.append(GroupList[0].totalLeaveSteps)
+            GroupList = []
             
-            #Plot the graphs
-            #1st graph is for ride locations
-            #2nd graph is movement of groups    
-            if (PlotOn):
-                plt.clf()
-                
-                plt.figure(1)
-                plt.imshow(grid)
-                plt.axis('off')
-                
-                plt.figure(2)
-                plt.imshow(walkGrid)
-                plt.axis('off')
-                
-                plt.show()
-                plt.pause(.1)
-                
-        time = 0
-        walkGrid = np.zeros((GridWidth, GridHeight))
-        TotalWalk += GroupList[0].TotalSteps
+        TotalWaitStepArray.append(waitStepArray)
+        TotalLeaveStepArray.append(leaveStepArray)
+        TotalWalkStepArray.append(walkStepArray)    
+              
+        TotalWalk = int(TotalWalk / Repetitions)
+        if MinWalk == 0 or TotalWalk < MinWalk:
+            MinWalkSteps = TotalWalk
+            OptimizedDestinations = GroupDestinations
+        TotalWalk = 0
         
-        walkStepArray.append(GroupList[0].totalWalkSteps)
-        waitStepArray.append(GroupList[0].totalWaitSteps)
-        leaveStepArray.append(GroupList[0].totalLeaveSteps)
-        GroupList = []
+        np.random.shuffle(GroupDestinations)
         
-    TotalWaitStepArray.append(waitStepArray)
-    TotalLeaveStepArray.append(leaveStepArray)
-    TotalWalkStepArray.append(walkStepArray)    
-          
-    TotalWalk = int(TotalWalk / Repetitions)
-    if MinWalk == 0 or TotalWalk < MinWalk:
-        MinWalkSteps = TotalWalk
-        OptimizedDestinations = GroupDestinations
-    TotalWalk = 0
-    
-    np.random.shuffle(GroupDestinations)
-    
-MinWalkSteps *= 2
-Modulus = MinWalkSteps % 60
-MinWalkSteps = int(MinWalkSteps / 60)
-print('Minimum time for ride schedule = ' + str(MinWalkSteps) + 'h' + str(Modulus) + 'm')
-RideString = ''
-for i in range(len(OptimizedDestination)):
-    RideString = RideString + str(rideNames[OptimizedDestination[i]])
-    if i < len(OptimizedDestination) - 1:
-        RideString += ' to '
-print(RideString)
-    
-    
+    MinWalkSteps *= 2
+    Modulus = MinWalkSteps % 60
+    MinWalkSteps = int(MinWalkSteps / 60)
+    print('Minimum time for ride schedule = ' + str(MinWalkSteps) + 'h' + str(Modulus) + 'm')
+    RideString = ''
+    for i in range(len(OptimizedDestination)):
+        RideString = RideString + str(rideNames[OptimizedDestination[i]])
+        if i < len(OptimizedDestination) - 1:
+            RideString += ' to '
+    print(RideString)
+        
+        
