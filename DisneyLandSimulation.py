@@ -139,7 +139,7 @@ class Group:
                             
     
     def calculateOpenRide(self):
-        if (len(self.Destinations) >= self.CurrentDestination):
+        if (len(self.Destinations) <= self.CurrentDestination):
             return False
         tempVal = self.Destinations[self.CurrentDestination]
         if (len(rideAvailableTime[tempVal]) > 0):
