@@ -7,6 +7,21 @@ def checkFloat(float1, float2, t=1e-10):
     return abs(float1 - float2) < t
 
 
+class TestSetup:
+    """Test suite for setup methods"""
+
+    def test_setUpGrid(self):
+        """Test the setup of grid of the simulation"""
+        D.setUpGrid()
+        assert len(D.AmusementRideList) == 30
+
+    def test_initGroups(self):
+        """Tests the setup of groups of the simulation"""
+        D.setUpGrid()
+        D.initGroups()
+        assert len(D.GroupList) == D.maxAttendees
+
+
 class TestGroup:
     """Test suite for the Group class"""
 
