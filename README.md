@@ -20,3 +20,10 @@ To run all unit tests, use the following command in the project directory:
 ```shell
 pytest
 ```
+
+If you want additional information of each of the unit test, use the
+following command instead:
+
+```shell
+pytest -v
+```
