@@ -428,8 +428,16 @@ if __name__ == "__main__":
                     GroupList[i].walk()
                 
                 for i in range(len(AmusementRideList)):
-                    AmusementRideList[i].Ride()
-                    AmusementRideList[i].FastPassRide()
+                    if (len(rideAvailableTime[i]) > 0):
+                        tempArr = rideAvailableTime[i]
+                        openRide = True
+                        for a in range(len(tempArr)):
+                            if (time > tempArr[a] and time < tempArr[a + 1]):
+                                openRide = False
+                            a += 1
+                        if (openRide):
+                            AmusementRideList[i].Ride()
+                            AmusementRideList[i].FastPassRide()
                 
                 #Plot the graphs
                 #1st graph is for ride locations
@@ -437,13 +445,15 @@ if __name__ == "__main__":
                 if (PlotOn):
                     plt.clf()
                     
-                    plt.figure(1)
+                    plt.subplot(1,2, 1)
                     plt.imshow(grid)
                     plt.axis('off')
                     
-                    plt.figure(2)
+                    plt.subplot(1,2, 2)
                     plt.imshow(walkGrid)
                     plt.axis('off')
+                    
+                    
                     
                     plt.show()
                     plt.pause(.1)
