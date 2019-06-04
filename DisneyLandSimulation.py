@@ -20,11 +20,11 @@ ridePercentages = [.1263, .0944, .0788, .0707, .0654, .0593, .0590, .0562, .0537
                     .0101, .0100, .0089, .0089, .0072, .0070, .0067]
 rideMax = [163, 352, 115, 773, 128, 213, 169, 369, 261, 246, 583, 237, 184, 28, 143, 40, 27, 16, 16, 45, 60, 360, 10, 20, 16, 30, 210, 24, 19, 100]
 rideDuration = [5, 10, 4, 15, 4, 5, 7, 9, 11, 8, 14, 10, 13, 3, 4, 4, 2, 2, 2, 5, 3, 18, 1, 2, 2, 3, 14, 4, 4, 10]
-rideNames = ['Space Mountain', 'Indiana Jones Adventure', 'Matterhorn Bobsleds', 'Pirates of the Caribbean', 'Big Thunder Mountain Railworld', 'Autopia', 'Star Tours The Adventures Continue',
-            'Haunted Mansion', 'Splash Mountain', 'Jungle Cruise', 'Its a Small World', 'Storybook Land Canal Boats', 'Finding Nemo Submarine Voyage', 'Peter Pans Flight',
-            'The Many Adventures of Winnie the Pooh', 'Alice in Wonderland', 'Mad Tea Party', 'Astro Orbiter', 'Dumbo the Flying Elephant', 'Buzz Lightyear Astro Blasters', 
-            'King Arthur Carrousel', 'Mark Twain Riverboat', 'Gadgets Go Coaster', 'Snow Whites Scary Adventures', 'Mr. Toads Wild Ride', 'Pinocchios Daring Journey', 'Sailing Ship Columbia'
-            'Casey Jr. Circus Train', 'Roger Rabbits Car Toon Spin', 'Davy Crocketts Explorer Canoes']
+rideNames = ['Space Mountain(0)', 'Indiana Jones Adventure(1)', 'Matterhorn Bobsleds(2)', 'Pirates of the Caribbean(3)', 'Big Thunder Mountain Railworld(4)', 'Autopia(5)', 'Star Tours The Adventures Continue(6)',
+            'Haunted Mansion(7)', 'Splash Mountain(8)', 'Jungle Cruise(9)', 'Its a Small World(10)', 'Storybook Land Canal Boats(11)', 'Finding Nemo Submarine Voyage(12)', 'Peter Pans Flight(13)',
+            'The Many Adventures of Winnie the Pooh(14)', 'Alice in Wonderland(15)', 'Mad Tea Party(16)', 'Astro Orbiter(17)', 'Dumbo the Flying Elephant(18)', 'Buzz Lightyear Astro Blasters(19)', 
+            'King Arthur Carrousel(20)', 'Mark Twain Riverboat(21)', 'Gadgets Go Coaster(22)', 'Snow Whites Scary Adventures(23)', 'Mr. Toads Wild Ride(24)', 'Pinocchios Daring Journey(25)', 'Sailing Ship Columbia(26)'
+            'Casey Jr. Circus Train(27)', 'Roger Rabbits Car Toon Spin(28)', 'Davy Crocketts Explorer Canoes(29)']
 nodes = [0, 1, 2, 3, 4, 5, 6]
 nodeConnections = [[1], [0, 2, 4, 5], [1, 3], [2], [1], [1, 6], [5]]
 rideNodeLocations = [3, 6, 2, 6, 6, 2, 2, 5, 5, 6, 4, 4, 2, 4, 5, 2, 2, 2, 4, 2, 4, 5, 4, 4, 4, 4, 5, 4, 4, 5]
@@ -35,13 +35,15 @@ rideAvailableTime = [[], [], [], [], [], [], [], [], [], [],
                      [], [], [], [], [], [], [], [], [], []]
 fastPassRides = [0, 1, 2, 4, 6, 7, 8, 10, 19, 28]
 
-AttendeesPerHour = [300, 100, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+AttendeesPerHour = [10000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 currentAttendeesPerHour = 0
-maxAttendees = 500
+maxAttendees = 80000
 repeatedRides = False
+FastPassOn = False
 
 #Our focus group
-GroupDestinations = [22, 27, 25]
+GroupDestinations = [0, 22, 1, 25, 4, 2, 17, 3, 16]#[3, 5, 13, 17, 20, 15, 16, 17, 18, 9]#
+
 GroupAmount = 3
 OptimizedDestination = GroupDestinations
 Entrance = [17, 19]
@@ -51,9 +53,9 @@ MinWalk = 0
 AverageRidesPerDay = 9
 Std = 1
 
-ShuffleAmount = 1
+ShuffleAmount = 20
 Repetitions = 1
-PlotOn = True
+PlotOn = False
 
 #statistics
 TotalWalkStepArray = []
@@ -101,10 +103,11 @@ class Group:
         self.totalLeaveSteps = 0
         
         #generating which rides have fast passes. Place holder until actual data is here
-        for i in range(np.random.randint(len(destinations))):
-            randomVal = np.random.randint(len(destinations))
-            if (destinations[randomVal] in fastPassRides):
-                self.FastPass[randomVal] = 1
+        if (FastPassOn == True):
+            for i in range(np.random.randint(len(destinations))):
+                randomVal = np.random.randint(len(destinations))
+                if (destinations[randomVal] in fastPassRides):
+                    self.FastPass[randomVal] = 1
         
         self.CurrentDestination = 0
         self.Status = -1
@@ -427,7 +430,7 @@ if __name__ == "__main__":
                         walkGrid[GroupList[i].Location[0]][GroupList[i].Location[1]] += GroupList[i].Count
                     GroupList[i].walk()
                 
-                for i in range(len(AmusementRideList)):
+                for i in range(len(rideAvailableTime)):
                     openRide = True
                     if (len(rideAvailableTime[i]) > 0):
                         tempArr = rideAvailableTime[i]
