@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+from scipy import stats
+import statistics
 
 #Globals ==============================
 
@@ -15,7 +17,7 @@ walkGrid = np.zeros((GridWidth, GridHeight))    #grid that holds amount of peopl
 ridelocation = [[27, 18], [8, 18], [23, 7], [7, 16], [9, 17], [13, 17], [21, 15], [5, 16], [4, 16], [13, 17], 
                 [13, 3], [22, 4], [17, 9], [18, 8], [1, 10], [20, 7], [20, 6], [19, 10], [18, 7], [23, 9], 
                 [16, 7], [8, 10], [16, 2], [16, 8], [19, 8], [15, 7], [9, 10], [16, 5], [22, 2], [7, 10] ]
-rideID = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+rideID = np.arange(30)
 ridePercentages = [.1263, .0944, .0788, .0707, .0654, .0593, .0590, .0562, .0537, .0352, .0348, .0268, .0236, .0228, .0213, .0197, .0161, .0146, .0137, .0131, .0131, .0119, .0107,
                     .0101, .0100, .0089, .0089, .0072, .0070, .0067]
 rideMax = [163, 352, 115, 773, 128, 213, 169, 369, 261, 246, 583, 237, 184, 28, 143, 40, 27, 16, 16, 45, 60, 360, 10, 20, 16, 30, 210, 24, 19, 100]
@@ -37,9 +39,9 @@ fastPassRides = [0, 1, 2, 4, 6, 7, 8, 10, 19, 28]
 
 AttendeesPerHour = [10000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 currentAttendeesPerHour = 0
-maxAttendees = 80000
+maxAttendees = 500
 repeatedRides = False
-FastPassOn = False
+FastPassOn = True 
 
 #Our focus group
 GroupDestinations = [0, 22, 1, 25, 4, 2, 17, 3, 16]#[3, 5, 13, 17, 20, 15, 16, 17, 18, 9]#
@@ -53,7 +55,7 @@ MinWalk = 0
 AverageRidesPerDay = 9
 Std = 1
 
-ShuffleAmount = 20
+ShuffleAmount = 1
 Repetitions = 1
 PlotOn = False
 
@@ -64,6 +66,8 @@ TotalLeaveStepArray = []
 walkStepArray = []
 waitStepArray = []
 leaveStepArray = []
+displayStatistics = False
+shuffledStatistics = False
 
 #How big the park is
 DisneyLandAcres = 85
@@ -92,7 +96,7 @@ class Group:
         self.Destinations = destinations
         self.RideIDList = rideIDs
         self.node = 0
-        self.nextNode = 1
+        self.nextNode = nodeConnections[self.node][0]
         self.nextNodeDestination = nodeLocations[self.nextNode]
         self.walkingTowardsNode = True
         self.FastPass = np.zeros(len(destinations))
@@ -102,8 +106,13 @@ class Group:
         self.totalWaitSteps = 0
         self.totalLeaveSteps = 0
         
-        #generating which rides have fast passes. Place holder until actual data is here
+        #generating which rides have fast passes.
         if (FastPassOn == True):
+            for i in range(np.random.randint(len(destinations))):
+                randomVal = np.random.randint(len(destinations))
+                if (destinations[randomVal] in fastPassRides):
+                    self.FastPass[randomVal] = 1
+        elif (FastPassOn == False and ID == 0):
             for i in range(np.random.randint(len(destinations))):
                 randomVal = np.random.randint(len(destinations))
                 if (destinations[randomVal] in fastPassRides):
@@ -492,5 +501,32 @@ if __name__ == "__main__":
         if i < len(OptimizedDestination) - 1:
             RideString += ' to '
     print(RideString)
+    
+    if (displayStatistics):
+        walkStatArray = []
+        waitStatArray = []
+        leaveStatArray = []
+        
+        if (shuffledStatistics == True):
+            for i in range(len(TotalWalkStepArray)):
+                walkStatArray.append(statistics.mean(TotalWalkStepArray[i]))
+            for i in range(len(TotalWaitStepArray)):
+                waitStatArray.append(statistics.mean(TotalWaitStepArray[i]))
+            for i in range(len(TotalLeaveStepArray)):
+                leaveStatArray.append(statistics.mean(TotalLeaveStepArray[i]))
+        else:
+            walkStatArray = TotalWalkStepArray[0]
+            waitStatArray = TotalWaitStepArray[0]
+            leaveStatArray = TotalLeaveStepArray[0]
+        
+        print()        
+        print('Walk step stats')
+        print(stats.describe(walkStatArray))
+        print()
+        print('Wait step stats')
+        print(stats.describe(waitStepArray))
+        print()
+        print('Leave step stats')
+        print(stats.describe(leaveStepArray))
         
         
