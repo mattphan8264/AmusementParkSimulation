@@ -209,3 +209,22 @@ class TestAmusementRide:
         ]
         assert self.amusementRide.GroupWaitingFastPass == []
 
+    def test_FastPassRide_Greater(self):
+        """Tests FastPassRide when there are over maximum attendees in line"""
+        self.amusementRide.CurrentTimeFastPass = 0
+        for i in range(0, 68):
+            self.amusementRide.groupLinedUpFastPass(i, 3)
+        self.amusementRide.FastPassRide()
+
+        # In order to compare, make a new list range 0 to 200 (MaxAttendees)
+        list_of_lists2 = []
+        for i in range(0, 66):
+            inner_list2 = [i]
+            inner_list2.append(3)
+            list_of_lists2.append(inner_list2)
+        assert self.amusementRide.CurrentTimeFastPass == 4
+        assert self.amusementRide.GroupRidingFastPass == list_of_lists2
+        assert self.amusementRide.GroupWaitingFastPass == [
+            [66, 3],
+            [67, 3],
+        ]
