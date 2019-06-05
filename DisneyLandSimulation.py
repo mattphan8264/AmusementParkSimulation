@@ -25,7 +25,7 @@ rideDuration = [5, 10, 4, 15, 4, 5, 7, 9, 11, 8, 14, 10, 13, 3, 4, 4, 2, 2, 2, 5
 rideNames = ['Space Mountain(0)', 'Indiana Jones Adventure(1)', 'Matterhorn Bobsleds(2)', 'Pirates of the Caribbean(3)', 'Big Thunder Mountain Railworld(4)', 'Autopia(5)', 'Star Tours The Adventures Continue(6)',
             'Haunted Mansion(7)', 'Splash Mountain(8)', 'Jungle Cruise(9)', 'Its a Small World(10)', 'Storybook Land Canal Boats(11)', 'Finding Nemo Submarine Voyage(12)', 'Peter Pans Flight(13)',
             'The Many Adventures of Winnie the Pooh(14)', 'Alice in Wonderland(15)', 'Mad Tea Party(16)', 'Astro Orbiter(17)', 'Dumbo the Flying Elephant(18)', 'Buzz Lightyear Astro Blasters(19)', 
-            'King Arthur Carrousel(20)', 'Mark Twain Riverboat(21)', 'Gadgets Go Coaster(22)', 'Snow Whites Scary Adventures(23)', 'Mr. Toads Wild Ride(24)', 'Pinocchios Daring Journey(25)', 'Sailing Ship Columbia(26)'
+            'King Arthur Carrousel(20)', 'Mark Twain Riverboat(21)', 'Gadgets Go Coaster(22)', 'Snow Whites Scary Adventures(23)', 'Mr. Toads Wild Ride(24)', 'Pinocchios Daring Journey(25)', 'Sailing Ship Columbia(26)',
             'Casey Jr. Circus Train(27)', 'Roger Rabbits Car Toon Spin(28)', 'Davy Crocketts Explorer Canoes(29)']
 nodes = [0, 1, 2, 3, 4, 5, 6]
 nodeConnections = [[1], [0, 2, 4, 5], [1, 3], [2], [1], [1, 6], [5]]
