@@ -188,3 +188,24 @@ class TestAmusementRide:
             [43, 5],
             [44, 5],
         ]
+        
+    def test_groupLinedUpFastPass(self):
+        """Tests groupLineUpFastpass and adding group"""
+        self.amusementRide.groupLinedUpFastPass(0, 3)
+        assert self.amusementRide.GroupWaitingFastPass == [[0, 3]]
+
+    def test_FastPassRide(self):
+        """Tests FastPassRide when there are under maximum attendees in line"""
+        self.amusementRide.CurrentTimeFastPass = 0
+        for i in range(0, 3):
+            self.amusementRide.groupLinedUpFastPass(i, 3)
+        self.amusementRide.FastPassRide()
+
+        assert self.amusementRide.CurrentTimeFastPass == 4
+        assert self.amusementRide.GroupRidingFastPass == [
+            [0, 3],
+            [1, 3],
+            [2, 3],
+        ]
+        assert self.amusementRide.GroupWaitingFastPass == []
+
